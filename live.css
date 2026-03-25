@@ -1,0 +1,14 @@
+html {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: verdana;
+    display: block;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+video {
+    width: 500px;
+    height: auto;
+}

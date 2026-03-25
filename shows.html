@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>brew - player</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <h1>brew</h1>
+    </nav>
+
+    <main>
+      <div class="controls">
+        <label>
+          season:
+          <select id="season"></select>
+        </label>
+
+        <label>
+          episode:
+          <select id="episode"></select>
+        </label>
+
+        <label>
+          source:
+          <select id="player-source">
+            <option value="streamlink">streamlink</option>
+            <option value="autoembed">autoembed.cc</option>
+            <option value="vidsrc">vidsrc</option>
+            <option value="moviesapi">moviesapi.club</option>
+            <option value="2embed">2embed</option>
+            <option value="vidrock">vidrock</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="player-container">
+        <h1>loading…</h1>
+      </div>
+      <button id="next-episode">next episode ▶</button>
+      <script src="next-episode.js"></script>
+    </main>
+
+    <script>
+      const API_KEY = "cdb2fc7a15fb9fd85a30da405caa6909";
+      const API_URL = "https://api.themoviedb.org/3";
+
+      const params = new URLSearchParams(window.location.search);
+      const tmdbId = params.get("tmdbid");
+
+      const seasonSelect = document.getElementById("season");
+      const episodeSelect = document.getElementById("episode");
+      const sourceSelect = document.getElementById("player-source");
+      const playerContainer = document.getElementById("player-container");
+
+      let currentSeason = 1;
+      let currentEpisode = 1;
+
+      async function fetchSeasons() {
+        const res = await fetch(
+          `${API_URL}/tv/${tmdbId}?api_key=${API_KEY}`
+        );
+        const data = await res.json();
+
+        seasonSelect.innerHTML = "";
+        data.seasons.forEach((s) => {
+          if (s.season_number === 0) return;
+          const opt = document.createElement("option");
+          opt.value = s.season_number;
+          opt.textContent = `season ${s.season_number}`;
+          seasonSelect.appendChild(opt);
+        });
+
+        fetchEpisodes(currentSeason);
+      }
+
+      let totalEpisodes = 0;
+
+async function fetchEpisodes(season) {
+  const res = await fetch(
+    `${API_URL}/tv/${tmdbId}/season/${season}?api_key=${API_KEY}`
+  );
+  const data = await res.json();
+
+  episodeSelect.innerHTML = "";
+  totalEpisodes = data.episodes.length;
+
+  data.episodes.forEach((ep) => {
+    const opt = document.createElement("option");
+    opt.value = ep.episode_number;
+    opt.textContent = `episode ${ep.episode_number} — ${ep.name}`;
+    episodeSelect.appendChild(opt);
+  });
+
+  loadShow();
+}
+
+
+     function loadShow() {
+  if (!tmdbId) return;
+
+  const iframe = document.createElement("iframe");
+  iframe.allow = "autoplay; fullscreen";
+  iframe.allowFullscreen = true;
+
+  const source = sourceSelect.value;
+
+  if (source === "streamlink") {
+    iframe.src = `https://www.vidlink.pro/tv/${tmdbId}/${currentSeason}/${currentEpisode}?autoplay=false`;
+  }
+  else if (source === "autoembed.cc") {
+    iframe.src = `https://autoembed.cc/tv/${tmdbId}/${currentSeason}/${currentEpisode}`;
+  }
+  else if (source === "moviesapi.club") {
+    iframe.src = `https://moviesapi.club/tv/${tmdbId}-${currentSeason}-${currentEpisode}`;
+  }
+  else if (source === "vidsrc") {
+    iframe.src = `https://vidsrc-embed.ru/embed/tv?tmdb=${tmdbId}&season=${currentSeason}&episode=${currentEpisode}`;
+  }
+  else if (source === "2embed") {
+    iframe.src = `https://www.2embed.skin/embedtv/${tmdbId}&s=${currentSeason}&e=${currentEpisode}`;
+  }
+  else if (source === "vidrock") {
+    iframe.src = `https://vidrock.net/tv/${tmdbId}/${currentSeason}/${currentEpisode}`;
+  }
+  else if (source === "primewire") {
+    iframe.src = `https://primesrc.me/embed/tv?tmdb=${tmdbId}&season=${currentSeason}&episode=${currentEpisode}`;
+  }
+  else if (source === "smashy.stream") {
+    iframe.src = `https://player.smashy.stream/tv/${tmdbId}?s=${currentSeason}&e=${currentEpisode}`;
+  }
+
+  playerContainer.innerHTML = "";
+  playerContainer.appendChild(iframe);
+}
+
+
+
+      seasonSelect.addEventListener("change", (e) => {
+        currentSeason = e.target.value;
+        currentEpisode = 1;
+        fetchEpisodes(currentSeason);
+      });
+
+      episodeSelect.addEventListener("change", (e) => {
+        currentEpisode = e.target.value;
+        loadShow();
+      });
+
+      sourceSelect.addEventListener("change", loadShow);
+
+      fetchSeasons();
+    </script>
+  </body>
+</html>
