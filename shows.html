@@ -32,6 +32,8 @@
             <option value="moviesapi">moviesapi.club</option>
             <option value="2embed">2embed</option>
             <option value="vidrock">vidrock</option>
+            <option value="tou">tou</option>
+            <option value="smashy.stream">smashy.stream</option>
           </select>
         </label>
       </div>
@@ -130,6 +132,9 @@ async function fetchEpisodes(season) {
   }
   else if (source === "smashy.stream") {
     iframe.src = `https://player.smashy.stream/tv/${tmdbId}?s=${currentSeason}&e=${currentEpisode}`;
+  }
+  else if (source === "tou") {
+    iframe.src = `https://toustream.movietrunk.com/tv/${tmdbId}/${currentSeason}/${currentEpisode}`;
   }
 
   playerContainer.innerHTML = "";
