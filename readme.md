@@ -9,7 +9,8 @@ make a new folder and open it with vscode
 
 in bash terminal, do these things:
 
-`git clone https://https://github.com/mysticful/brew
+`git clone https://https://github.com/fkrbt/brew
 cd brew
 python3 -m http.server 8080`
+
 and youre done! go to localhost:8080 to use the site!
